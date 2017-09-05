@@ -166,10 +166,19 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Charles是网络调试利器，但是使用的时候也带来一些麻烦，比如手机忘记设置手动代理了，或者调试完忘记关掉手动代理，打不开网页很是蛋疼，那么今天我们就来搞定它，我们来使用自动代理，一劳永逸的办法。一些基础东西就不说了，直接讲方法。<br>
-        
-          <a class="article-more-a" href="/2017/09/05/Charles设置自动代理/#more">more >></a>
-        
+        <p>Charles是网络调试利器，但是使用的时候也带来一些麻烦，比如手机忘记设置手动代理了，或者调试完忘记关掉手动代理，打不开网页很是蛋疼，那么今天我们就来搞定它，我们来使用自动代理，一劳永逸的办法。一些基础东西就不说了，直接讲方法。</p>
+<p>首先创建一个<code>pac</code>文件，假设命名为<code>proxy.pac</code>，里面内容可以网上搜索。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//一个很简单的调试app pac文件</div><div class="line">function FindProxyForURL(url, host) &#123;</div><div class="line">               //这里填写你们公司的host</div><div class="line">	if (dnsDomainIs(host, &apos;xxx.com&apos;)) &#123;</div><div class="line">               //这里填你自己的局域网ip，端口号是你在Charles里设置的 默认8888</div><div class="line">		return &quot;PROXY 192.168.2.200:8888; DIRECT;&quot;;</div><div class="line">	&#125; else &#123;</div><div class="line">		return &quot;DIRECT&quot;;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>简单解释下，这个pac文件会被macOS或者iOS(对应你的模拟器和真机)系统在发起网络请求时执行，它会告诉系统如果是xxx.com的请求那么去访问这个192.168.2.200:8888，如果访问不到那在直连。</p>
+<p>####现在需要把这个文件设置为自动代理配置  这里用到mac自带web server(还有其他的办法 比如使用macOS的smb，试了1个小时没成功，暂时放弃了🤣, 更简单的就是直接挂到网站上)<br>终端执行该命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apachectl start</div></pre></td></tr></table></figure></p>
+<p>输入密码，然后打开 <a href="http://localhost/" target="_blank" rel="external">http://localhost/</a>如果显示It works就是正常。<br>然后打开<code>Finder</code>, <code>Shift+G</code>输入<code>/Library/WebServer/Documents/</code>把你的pac文件扔进去，可能需要鉴定，输入密码就行。</p>
+<p>#####然后就是配置mac和iphone</p>
+<p>######mac配置<br><code>偏好设置</code>-&gt;<code>网络</code>-&gt;<code>高级</code>-&gt;<code>代理</code>-&gt;<code>自动代理</code></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/704111-318b6bdfcd56a2d0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>######iPhone配置<br><code>设置</code>-&gt;<code>无线局域网</code>-&gt;<code>HTTP代理</code>-&gt;<code>自动</code><br>URL填入 <code>http://你的mac局域网ip/proxy.pac</code></p>
+<p>OK 设置完毕，现在可以享受了，打开模拟器 然后打开charles 发现不用打开macOS proxy也可以抓包了，手机调试app也没问题，而且就算charles关了也能正常上网，是不是很爽。😄</p>
+<p>像我这种公司家不分的人，还固定了局域网ip，这样就不用在家里和公司修改pac文件了，公司ip固定找运维，家里的自己搞下就行。方法网上很多。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/704111-7750e9fc33a2413c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+
       
 
       
